@@ -1,0 +1,134 @@
+
+1 Etapa
+Iniciar transaction por segurança, mesmo após fazer backup.
+
+``` sql
+BEGIN TRAN;
+```
+
+2 Etapa
+
+Separar e estruturar a query de fará a inserção dos dados no banco de dados.
+``` sql
+INSERT INTO dbo.Produto_Fornecedores
+(
+Ide
+,Produto__Codigo
+,Cli_For__Codigo
+,Codigo_Fornecedor
+,Cli_For__Ide
+,Data_Alteracao
+,Status
+,Caixa_Com
+,Produto__Codigo_Grade
+,Produto__Tamanho
+,Produto__Cor
+,NomeProdutoNoFornecedor
+,Produto__Ide
+,ProdutoGrade__Ide
+)
+Values
+(NEWID(),'1',0,7,'00000000-0000-0000-0000-000000000000',GETDATE(),0,1,'',0,0,'','00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-000000000000'),
+(NEWID(),'2',0,7,'00000000-0000-0000-0000-000000000000',GETDATE(),0,1,'',0,0,'','00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-000000000000'),
+(NEWID(),'3',0,7,'00000000-0000-0000-0000-000000000000',GETDATE(),0,1,'',0,0,'','00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-000000000000'),
+
+update pf set Produto__Ide = p.ide
+from Produto_Fornecedores pf
+join Produto p on p.codigo = pf.Produto__Codigo
+
+update pf set Cli_For__Ide = cf.ide
+from Produto_Fornecedores pf
+join Cli_For cf on cf.codigo = pf.Codigo_Fornecedor
+```
+
+A query é dividida em duas partes:
+
+1. Insert para criação dos fornecedores na tabela
+	Com essa parte sendo a mais trabalhosa.
+
+2. Associar o produto e clifor(fornecedor) ao nosso ProdutoFornecedor.
+
+---
+
+Na prática:
+
+Listar todos os produtos(codigos) e clifor(codigo) dos seus fornecedores. 
+	Exemplo: 23 → 8 → 119774884
+	Logo o Produto 23 tem como Fornecedor o Cli_for 8  e 119774884 é o codigoFabricante1(Código em Comum)
+
+Para facilitar a montagem da query vou deixar um modelo excel que facilita a construção.
+
+![[FornecedorToProduto.xlsx]]
+
+Após colocar as informações na planilha é só colocar no SQL
+
+``` sql
+INSERT INTO dbo.Produto_Fornecedores
+(
+Ide
+,Produto__Codigo
+,Cli_For__Codigo
+,Codigo_Fornecedor
+,Cli_For__Ide
+,Data_Alteracao
+,Status
+,Caixa_Com
+,Produto__Codigo_Grade
+,Produto__Tamanho
+,Produto__Cor
+,NomeProdutoNoFornecedor
+,Produto__Ide
+,ProdutoGrade__Ide
+)
+Values
+// RESULTADO DA PLANILHA AQUI
+```
+
+Se ocorrer tudo certo, é só rodar a segunda parte do comando:
+
+``` sql
+update pf set Produto__Ide = p.ide
+from Produto_Fornecedores pf
+join Produto p on p.codigo = pf.Produto__Codigo
+
+update pf set Cli_For__Ide = cf.ide
+from Produto_Fornecedores pf
+join Cli_For cf on cf.codigo = pf.Codigo_Fornecedor
+```
+
+Verificou está tudo certo? 
+
+``` sql
+COMMIT;
+```
+
+Finalizado!
+
+Tem algo errado?
+
+```sql
+ROLLBACK;
+```
+
+Verificar o que gerou o erro e refazer todas as etapas do inicio.
+
+
+---- new query ajustadas
+
+update pf set Produto__Ide = p.ide
+from Produto_Fornecedores pf
+join Produto p on p.codigo = pf.Produto__Codigo
+
+update pf set Cli_For__Ide = cf.ide
+from Produto_Fornecedores pf
+join Cli_For cf on cf.codigo = pf.Codigo_Fornecedor
+
+Select * from Produto_Fornecedores
+
+update pf set Produto__Ide = p.ide
+from Produto_Fornecedores pf
+join Produto p on p.codigo = pf.Produto__Codigo
+
+update pf set Cli_For__Ide = cf.ide
+from Produto_Fornecedores pf
+join Cli_For cf on cf.codigo = pf.Cli_For__Codigo
